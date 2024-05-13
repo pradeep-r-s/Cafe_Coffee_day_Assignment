@@ -3,6 +3,7 @@ import axios from 'axios';
 import jsPDF from 'jspdf'; // Import jsPDF library
 import 'jspdf-autotable'; // Import autoTable plugin
 import moment from 'moment'; // Import moment.js for date parsing
+import logo from "./logo.png";
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -58,14 +59,18 @@ const Transactions = () => {
   return (
     <div className="container mt-5">
       <h1 className="text-center mb-4"><b>All Transactions</b></h1>
+      <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+      <img src={logo} alt="Logo"  />
+      </div>
 
       {/* Invoice Section */}
       <div className="mb-4">
         <h2>Invoice Section</h2>
         <div>
-          <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+        <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />{"\t"}
           <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
-          <button onClick={handleDateFilter}>Generate Invoices</button>
+          <p></p>
+          <button onClick={handleDateFilter} class="btn btn-danger">Generate Invoices</button>
         </div>
       </div>
 
@@ -75,7 +80,7 @@ const Transactions = () => {
         <table id="transactions-table" className="table">
           <thead>
             <tr>
-              <th>Date</th>
+              <th>Date & Time</th>
               <th>Invoice No</th>
               <th>Product Name</th>
               <th>Price</th>
@@ -86,7 +91,7 @@ const Transactions = () => {
           <tbody>
             {filteredTransactions.map(transaction => (
               <tr key={transaction.transaction_id}>
-                <td>{transaction.transaction_date}</td>
+                <td>{moment(transaction.transaction_date).format('YYYY-MM-DD HH:mm:ss')}</td> {/* Format date and time */}
                 <td>{transaction.transaction_id}</td>
                 <td>{transaction.product_name}</td>
                 <td>${transaction.price}</td>
@@ -101,7 +106,7 @@ const Transactions = () => {
       {/* Generate Invoice Button */}
       <div className="text-center">
         {filteredTransactions.length > 0 ? (
-          <button onClick={generateInvoice}>Generate Invoice PDF</button>
+          <button onClick={generateInvoice} className="btn btn-info" >Generate Invoice PDF</button>
         ) : (
           <p>Select dates to filter and generate invoice.</p>
         )}

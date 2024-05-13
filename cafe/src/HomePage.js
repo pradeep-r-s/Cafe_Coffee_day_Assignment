@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import cafeImage from './coffee.jpg'; // Import the image
+import logo from "./logo.png";
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = ({ userId }) => {
     console.log("userId in HomePage:", userId);
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
     const [orderPlaced, setOrderPlaced] = useState(false); // State variable for order placed message
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -18,7 +21,6 @@ const HomePage = ({ userId }) => {
                 console.error('Error fetching data:', error);
             }
         };
-
         fetchData();
     }, []);
 
@@ -52,9 +54,9 @@ const HomePage = ({ userId }) => {
             user_id: 1, // Use the userId passed to the component
             totalprice: product.totalPrice
         }));
-    
+
         const grandTotal = cart.reduce((total, item) => total + item.totalPrice, 0); // Calculate grand total
-    
+
         try {
             const response = await axios.post('http://localhost:3001/record-transaction', {
                 transactions: transactionsData,
@@ -64,13 +66,12 @@ const HomePage = ({ userId }) => {
         } catch (error) {
             console.error('Error recording transactions:', error); // Log error for debugging
         }
-    
+        localStorage.setItem('transactions', JSON.stringify(cart));
         // Clear cart and handle order placement logic after successful transaction
         setCart([]);
         setOrderPlaced(true);
+        navigate('/billing'); 
     };
-    
-      
 
     // Split products into chunks of 4
     const chunkedProducts = [];
@@ -85,36 +86,30 @@ const HomePage = ({ userId }) => {
     }
 
     return (
-        <div className="container mt-5" style={{ backgroundColor: 'white', padding: '20px' }}>
-            <h1 className="text-center mb-4"><b>Products</b></h1>
+        <div className="container mt-5" style={{ backgroundColor: 'white', padding: '25px' }}>
+        <h1 className="text-center mb-4" style={{ textAlign: 'center', marginTop: '-70px' }}><b>Products</b></h1>
+            <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+                <img src={logo} alt="Logo" />
+            </div>
             {userId && <p>User ID: {userId}</p>}
             {chunkedProducts.map((chunk, index) => (
                 <div key={index} className="row">
                     {chunk.map(product => (
                         <div key={product.item_id} className="col-md-3 mb-4">
-                            <div className="card" style={{ maxWidth: '200px' }}> {/* Limit card width */}
-                                <img 
-                                    src={cafeImage} 
-                                    className="card-img-top" 
-                                    alt="Cafe" 
-                                    style={{ width: '200px', height: '150px' }} // Set image dimensions
+                            <div className="card" style={{maxWidth: '200px',borderRadius: '15px',background:'#f0f0f0',padding:'5px' }}> {/* Limit card width */}
+                                <img
+                                    src={cafeImage}
+                                    className="card-img-top"
+                                    alt="Cafe"
+                                    style={{ width: '190px', height: '150px',borderRadius: '15px',padding:'10px' }} // Set image dimensions
                                 />
-                                <div className="card-body" style={{ maxHeight: '180px' }}> {/* Limit card body height */}
+                                <div className="card-body" style={{ maxHeight: '180px',width: '170px',marginLeft:'10px',borderRadius: '10px',background:'#FEECEB',padding:'10px'  }} > {/* '#D61820'Limit card body height */}
                                     <h5 className="card-title">{product.name}</h5>
                                     <p className="card-text">Price: ${product.price}</p>
-                                    <button 
-                                        className="btn btn-primary" 
-                                        onClick={() => addToCart(product)}
-                                    >
-                                        Add to Cart
-                                    </button>
-                                    <div className="mt-2">
-                                        <button 
-                                            className="btn btn-secondary" 
-                                            onClick={() => removeFromCart(product.item_id)}
-                                        >
-                                            Remove
-                                        </button>
+                                    <button className="btn btn-primary" onClick={() => addToCart(product)}> Add to Cart</button>
+                                    <div className="mt-2" >
+                                    <button style={{ width: '71.3%', marginRight: '5px' }} className="btn btn-danger" onClick={() => removeFromCart(product.item_id)}>Remove</button>
+                                        {/* <button className="btn btn-warning" onClick={() => removeFromCart(product.item_id)}> Remove </button> */}
                                     </div>
                                 </div>
                             </div>
@@ -123,14 +118,14 @@ const HomePage = ({ userId }) => {
                 </div>
             ))}
             <div className="text-center mt-4">
-                <div style={{ backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '10px' }}> {/* Box-like styling */}
+                <div style={{ backgroundColor: '#FEECEB', padding: '20px', borderRadius: '15px', border: '2px solid #f0f0f0' }}> {/* Box-like styling */}
                     <h2>Cart Items</h2>
                     {chunkedCart.map((chunk, index) => (
                         <div key={index} className="row">
                             {chunk.map((item, idx) => (
                                 <div key={idx} className="col-md-3 mb-4">
-                                    <div className="card" style={{ maxWidth: '200px' }}> {/* Limit card width */}
-                                        <div className="card-body" style={{ maxHeight: '180px' }}> {/* Limit card body height */}
+                                    <div className="card" style={{ borderRadius:'15px',maxWidth: '200px' }}> {/* Limit card width */}
+                                        <div className="card-body" style={{maxHeight: '175px' }}> {/* Limit card body height */}
                                             <h5 className="card-title">{item.name}</h5>
                                             <p className="card-text">Price: ${item.price}</p>
                                             <p>Quantity: {item.quantity}</p>
@@ -144,10 +139,11 @@ const HomePage = ({ userId }) => {
                     <p><b>Grand Total: ${cart.reduce((total, item) => total + item.totalPrice, 0)}</b></p> {/* Display grand total */}
                     <button className="btn btn-success" onClick={handleBuyNow}>Buy Now</button> {/* Buy Now button */}
                     {orderPlaced && <p style={{ color: 'red' }}>Order placed</p>} {/* Conditionally render order placed message */}
+                    {orderPlaced && <Link to="/billing">View Order Details</Link>}
                 </div>
             </div >
             <div className="text-left mt-4">
-                <Link to="/transactions">View Transactions</Link>
+                <Link to="/transactions"><b>View All Transactions</b></Link>
             </div>
         </div>
     );

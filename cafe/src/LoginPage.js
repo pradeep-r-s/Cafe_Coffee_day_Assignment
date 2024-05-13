@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Axios from 'axios';
 import { useNavigate, Link } from "react-router-dom";
+import logo from "./logo.png";
 
 const LoginPage = ({ setUserId }) => {
   const [username, setUsername] = useState('');
@@ -40,10 +41,15 @@ const LoginPage = ({ setUserId }) => {
 
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <div style={{ background:'white',display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+      <img src={logo} alt="Logo"  />
+      </div>
+      <div style={{ background:'#FEECEB',display: 'flex',borderRadius: '10px', justifyContent: 'center',border: '1.5px solid black', borderColor: '#B7C9E2' }}>
       <div className="container">
         <h1>Login</h1>
-        <div className="form-group">
+        <p></p><p></p>
+        <div className="form-group" style={{ width: '100%' }}>
           <input 
             type="text" 
             placeholder="Username..."
@@ -53,7 +59,7 @@ const LoginPage = ({ setUserId }) => {
           />
         </div>
         <p></p>
-        <div className="form-group">
+        <div className="form-group" style={{ width: '100%' }}>
           <input 
             type="password" 
             placeholder="Password..."
@@ -63,10 +69,11 @@ const LoginPage = ({ setUserId }) => {
           />
         </div>
         <p></p>
-        <button className="btn btn-primary" onClick={login}>Login</button>
+        <button className="btn btn-danger" onClick={login}>Login</button>
         {loginError && <p className="text-danger">{loginError}</p>}
         <p>Don't have an account? <Link to="/register">Register here</Link></p>
       </div>
+    </div>
     </div>
   );
 }
